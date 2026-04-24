@@ -1,0 +1,10 @@
+-- Rôle :
+-- Créer la table users.
+--
+-- À faire :
+-- - id
+-- - username
+-- - email unique
+-- - password
+-- - public_key
+-- - created_at

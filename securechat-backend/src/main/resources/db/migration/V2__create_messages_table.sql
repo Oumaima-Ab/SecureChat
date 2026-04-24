@@ -1,0 +1,12 @@
+-- Rôle :
+-- Créer la table messages.
+--
+-- À faire :
+-- - id
+-- - sender_id
+-- - recipient_id
+-- - encrypted_content
+-- - signature
+-- - sent_at
+-- - is_read
+-- - foreign keys vers users
