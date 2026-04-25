@@ -20,18 +20,20 @@ import com.securechat.dto.LoginRequest;
 import com.securechat.dto.RegisterRequest;
 import com.securechat.model.User;
 import com.securechat.repository.UserRepository;
+import com.securechat.security.JwtUtils;
 import com.securechat.service.AuthService;
 import org.springframework.stereotype.Service;
-
 import java.util.Optional;
 
 @Service
 public class AuthServiceImpl implements AuthService {
 
     private final UserRepository userRepository;
+    private final JwtUtils jwtUtils;
 
-    public AuthServiceImpl(UserRepository userRepository) {
+    public AuthServiceImpl(UserRepository userRepository, JwtUtils jwtUtils) {
         this.userRepository = userRepository;
+        this.jwtUtils = jwtUtils;
     }
 
     @Override
@@ -68,10 +70,8 @@ public class AuthServiceImpl implements AuthService {
             throw new RuntimeException("Invalid password");
         }
 
-        // token temporaire
-        String fakeToken = "fake-jwt-token";
-
-        return new AuthResponse(fakeToken);
+        String token = jwtUtils.generateToken(user.getEmail());
+        return new AuthResponse(token);
     }
 
 }
