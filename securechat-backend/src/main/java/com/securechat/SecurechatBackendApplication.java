@@ -8,7 +8,6 @@ public class SecurechatBackendApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(SecurechatBackendApplication.class, args);
-        System.out.println("hello world");
     }
 
 }

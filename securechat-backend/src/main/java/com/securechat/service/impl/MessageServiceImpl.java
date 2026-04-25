@@ -13,6 +13,35 @@ package com.securechat.service.impl;
  * Couche :
  * Service Implementation
  */
-public class MessageServiceImpl {
+import com.securechat.dto.MessageRequest;
+import com.securechat.repository.MessageRepository;
+import com.securechat.service.MessageService;
+import org.springframework.stereotype.Service;
+
+@Service
+public class MessageServiceImpl implements MessageService {
+
+    private final MessageRepository messageRepository;
+
+    public MessageServiceImpl(MessageRepository messageRepository) {
+        this.messageRepository = messageRepository;
+    }
+
+    @Override
+    public String sendMessage(MessageRequest request) {
+        return "Message stored for: " + request.getRecipient();
+    }
+
+    @Override
+    public String getInbox() {
+        return "Inbox messages";
+    }
+
+    @Override
+    public String deleteMessage(Long id) {
+        return "Message deleted: " + id;
+    }
+
+
 }
 
