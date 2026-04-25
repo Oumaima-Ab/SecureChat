@@ -17,5 +17,12 @@ package com.securechat.service;
  * Service / Crypto
  */
 public interface CryptoService {
+	String encrypt(String plainText, String publicKey);
+
+	String decrypt(String encryptedText, String privateKey);
+
+	String sign(String data, String privateKey);
+
+	boolean verify(String data, String signature, String publicKey);
 }
 
