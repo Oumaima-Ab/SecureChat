@@ -23,6 +23,8 @@ import com.securechat.repository.UserRepository;
 import com.securechat.security.JwtUtils;
 import com.securechat.service.AuthService;
 import org.springframework.stereotype.Service;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
 import java.util.Optional;
 
 @Service
@@ -30,10 +32,12 @@ public class AuthServiceImpl implements AuthService {
 
     private final UserRepository userRepository;
     private final JwtUtils jwtUtils;
+    private final PasswordEncoder passwordEncoder;
 
-    public AuthServiceImpl(UserRepository userRepository, JwtUtils jwtUtils) {
+    public AuthServiceImpl(UserRepository userRepository, JwtUtils jwtUtils, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.jwtUtils = jwtUtils;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -43,10 +47,14 @@ public class AuthServiceImpl implements AuthService {
             return "Email already exists";
         }
 
+        if (userRepository.existsByUsername(request.getUsername())) {
+            return "Username already exists";
+        }
+
         User user = new User();
         user.setUsername(request.getUsername());
         user.setEmail(request.getEmail());
-        user.setPassword(request.getPassword());
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
 
         userRepository.save(user);
 
@@ -65,8 +73,7 @@ public class AuthServiceImpl implements AuthService {
 
         User user = userOpt.get();
 
-        // temporaire (sans BCrypt)
-        if (!user.getPassword().equals(request.getPassword())) {
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new RuntimeException("Invalid password");
         }
 
