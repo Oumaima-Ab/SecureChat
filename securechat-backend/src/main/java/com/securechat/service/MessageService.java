@@ -1,6 +1,9 @@
 package com.securechat.service;
 
+import com.securechat.dto.MessageResponse;
 import com.securechat.dto.MessageRequest;
+
+import java.util.List;
 
 /*
  * Rôle :
@@ -15,8 +18,7 @@ import com.securechat.dto.MessageRequest;
  * Service / Métier
  */
 public interface MessageService {
-    String sendMessage(MessageRequest request);
-    String getInbox();
+    MessageResponse sendMessage(MessageRequest request);
+    List<MessageResponse> getInbox();
     String deleteMessage(Long id);
 }
-

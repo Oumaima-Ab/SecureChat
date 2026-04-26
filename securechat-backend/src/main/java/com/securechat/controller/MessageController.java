@@ -17,10 +17,13 @@ package com.securechat.controller;
  * Controller / Présentation
  */
 
+import com.securechat.dto.MessageResponse;
 import com.securechat.dto.MessageRequest;
 import com.securechat.service.MessageService;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/messages")
@@ -32,12 +35,12 @@ public class MessageController {
     }
 
     @PostMapping("/send")
-    public String send(@Valid @RequestBody MessageRequest request) {
+    public MessageResponse send(@Valid @RequestBody MessageRequest request) {
         return messageService.sendMessage(request);
     }
 
     @GetMapping("/inbox")
-    public String inbox() {
+    public List<MessageResponse> inbox() {
         return messageService.getInbox();
     }
 
@@ -47,4 +50,3 @@ public class MessageController {
     }
 
 }
-

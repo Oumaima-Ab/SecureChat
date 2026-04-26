@@ -20,8 +20,12 @@ import com.securechat.dto.LoginRequest;
 import com.securechat.dto.RegisterRequest;
 import com.securechat.model.User;
 import com.securechat.repository.UserRepository;
+import com.securechat.security.JwtUtils;
 import com.securechat.service.AuthService;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Optional;
 
@@ -29,22 +33,32 @@ import java.util.Optional;
 public class AuthServiceImpl implements AuthService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtUtils jwtUtils;
 
-    public AuthServiceImpl(UserRepository userRepository) {
+    public AuthServiceImpl(
+            UserRepository userRepository,
+            PasswordEncoder passwordEncoder,
+            JwtUtils jwtUtils
+    ) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.jwtUtils = jwtUtils;
     }
 
     @Override
     public String register(RegisterRequest request) {
-
         if (userRepository.existsByEmail(request.getEmail())) {
-            return "Email already exists";
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already exists");
+        }
+        if (userRepository.existsByUsername(request.getUsername())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Username already exists");
         }
 
         User user = new User();
         user.setUsername(request.getUsername());
         user.setEmail(request.getEmail());
-        user.setPassword(request.getPassword());
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
 
         userRepository.save(user);
 
@@ -54,25 +68,19 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public AuthResponse login(LoginRequest request) {
-
         Optional<User> userOpt = userRepository.findByEmail(request.getEmail());
 
         if (userOpt.isEmpty()) {
-            throw new RuntimeException("User not found");
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials");
         }
 
         User user = userOpt.get();
 
-        // temporaire (sans BCrypt)
-        if (!user.getPassword().equals(request.getPassword())) {
-            throw new RuntimeException("Invalid password");
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials");
         }
 
-        // token temporaire
-        String fakeToken = "fake-jwt-token";
-
-        return new AuthResponse(fakeToken);
+        return new AuthResponse(jwtUtils.generateToken(user.getEmail()));
     }
 
 }
-

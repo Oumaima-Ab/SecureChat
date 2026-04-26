@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SecureChat Test</title>
+</head>
+<body>
+
+<h2>Auth</h2>
+
+<input id="username" placeholder="username" autocomplete="username"><br>
+<input id="email" placeholder="email" autocomplete="email"><br>
+<input id="password" type="password" placeholder="password" autocomplete="current-password"><br>
+
+<button onclick="register()">Register</button>
+<button onclick="login()">Login</button>
+
+<h2>Message</h2>
+
+<input id="recipient" placeholder="recipient email or username"><br>
+<textarea id="content" placeholder="encrypted content"></textarea><br>
+<input id="signature" placeholder="signature"><br>
+
+<button onclick="sendMessage()">Send Message</button>
+<button onclick="getInbox()">Inbox</button>
+
+<pre id="output"></pre>
+
+<script>
+    let token = "";
+
+    function log(data) {
+        document.getElementById("output").innerText =
+            typeof data === "string" ? data : JSON.stringify(data, null, 2);
+    }
+
+    // REGISTER
+    function register() {
+        fetch("http://localhost:8080/api/auth/register", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({
+                username: document.getElementById("username").value,
+                email: document.getElementById("email").value,
+                password: document.getElementById("password").value
+            })
+        })
+            .then(async res => {
+                const text = await res.text();
+                if (!res.ok) throw new Error(text || "Register failed");
+                return text;
+            })
+            .then(data => log({message: data}))
+            .catch(err => log(err));
+    }
+
+    // LOGIN
+    function login() {
+        fetch("http://localhost:8080/api/auth/login", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({
+                email: document.getElementById("email").value,
+                password: document.getElementById("password").value
+            })
+        })
+            .then(async res => {
+                const text = await res.text();
+                if (!res.ok) throw new Error(text || "Login failed");
+                return JSON.parse(text);
+            })
+            .then(data => {
+                token = data.token;
+                log(data);
+            })
+            .catch(err => log(err.message));
+    }
+
+    // SEND MESSAGE
+    function sendMessage() {
+        fetch("http://localhost:8080/api/messages/send", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + token
+            },
+            body: JSON.stringify({
+                recipient: document.getElementById("recipient").value,
+                encryptedContent: document.getElementById("content").value,
+                signature: document.getElementById("signature").value
+            })
+        })
+            .then(async res => {
+                const text = await res.text();
+                if (!res.ok) throw new Error(text || "Send failed");
+                return JSON.parse(text);
+            })
+            .then(data => log(data))
+            .catch(err => log(err.message));
+    }
+
+    // GET INBOX
+    function getInbox() {
+        fetch("http://localhost:8080/api/messages/inbox", {
+            method: "GET",
+            headers: {
+                "Authorization": "Bearer " + token
+            }
+        })
+            .then(async res => {
+                const text = await res.text();
+                if (!res.ok) throw new Error(text || "Inbox failed");
+                return JSON.parse(text);
+            })
+            .then(data => log(data))
+            .catch(err => log(err.message));
+    }
+</script>
+
+</body>
+</html>

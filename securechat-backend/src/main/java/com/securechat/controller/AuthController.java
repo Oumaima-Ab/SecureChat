@@ -14,6 +14,7 @@ package com.securechat.controller;
  *
  * Couche :
  * Controller / Présentation
+ *
  */
 import com.securechat.dto.AuthResponse;
 import com.securechat.dto.LoginRequest;
