@@ -1,38 +1,42 @@
 package com.securechat.security;
 
-import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.Jwts;
+/*
+ * Rôle :
+ * Gérer les tokens JWT.
+ *
+ * À faire :
+ * - generateToken()
+ * - validateToken()
+ * - extractEmail()
+ *
+ * Couche :
+ * Security / JWT
+ */
+
+
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.oauth2.jwt.JwtException;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
-import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 @Component
 public class JwtUtils {
 
-    private final String secret;
-    private final long expiration;
-
-    public JwtUtils(
-            @Value("${jwt.secret}") String secret,
-            @Value("${jwt.expiration}") long expiration
-    ) {
-        this.secret = secret;
-        this.expiration = expiration;
-    }
+    private final String SECRET = "my-super-secret-key-my-super-secret-key";
+    private final long EXPIRATION = 86400000; // 24h
 
     private SecretKey getSigningKey() {
-        return Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
+        return Keys.hmacShaKeyFor(SECRET.getBytes());
     }
 
     public String generateToken(String email) {
         return Jwts.builder()
                 .subject(email)
                 .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() + expiration))
+                .expiration(new Date(System.currentTimeMillis() + EXPIRATION))
                 .signWith(getSigningKey())
                 .compact();
     }
@@ -53,8 +57,9 @@ public class JwtUtils {
                     .build()
                     .parseSignedClaims(token);
             return true;
-        } catch (JwtException | IllegalArgumentException e) {
+        } catch (JwtException e) {
             return false;
         }
     }
 }
+

@@ -1,9 +1,8 @@
 package com.securechat.service;
 
-import com.securechat.dto.MessageResponse;
 import com.securechat.dto.MessageRequest;
 
-import java.util.List;
+import java.util.*;
 
 /*
  * Rôle :
@@ -18,7 +17,9 @@ import java.util.List;
  * Service / Métier
  */
 public interface MessageService {
-    MessageResponse sendMessage(MessageRequest request);
-    List<MessageResponse> getInbox();
-    String deleteMessage(Long id);
+    Map<String, Object> sendMessage(MessageRequest request, String senderEmail);
+
+    List<Map<String, Object>> getInbox(String email);
+
+    String deleteMessage(Long id, String email);
 }

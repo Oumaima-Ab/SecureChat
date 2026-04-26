@@ -1,17 +1,23 @@
 package com.securechat.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.Table;
+/*
+ * Rôle :
+ * Représente un message envoyé entre deux utilisateurs.
+ *
+ * À faire :
+ * - Ajouter @Entity
+ * - Ajouter : id, sender, recipient, encryptedContent, signature, sentAt, read
+ * - Relier sender et recipient à User avec @ManyToOne
+ *
+ * Couche :
+ * Model / Entity
+ */
+
+
+import jakarta.persistence.*;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
@@ -26,28 +32,32 @@ public class Message {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    // expéditeur
     @ManyToOne
     @JoinColumn(name = "sender_id", nullable = false)
     private User sender;
 
+    // destinataire
     @ManyToOne
     @JoinColumn(name = "recipient_id", nullable = false)
     private User recipient;
 
+    // contenu chiffré
     @Column(name = "encrypted_content", nullable = false, columnDefinition = "TEXT")
     private String encryptedContent;
 
+    // signature (intégrité)
     @Column(nullable = false, columnDefinition = "TEXT")
     private String signature;
 
     @Column(name = "sent_at", nullable = false)
     private LocalDateTime sentAt;
 
-    @Column(name = "is_read", nullable = false)
+    @Column(name = "is_read")
     private boolean isRead = false;
 
     @PrePersist
     protected void onCreate() {
-        sentAt = LocalDateTime.now();
+        this.sentAt = LocalDateTime.now();
     }
 }

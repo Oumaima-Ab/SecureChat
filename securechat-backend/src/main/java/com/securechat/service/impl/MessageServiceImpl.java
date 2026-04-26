@@ -13,38 +13,41 @@ package com.securechat.service.impl;
  * Couche :
  * Service Implementation
  */
-import com.securechat.dto.MessageResponse;
+
 import com.securechat.dto.MessageRequest;
 import com.securechat.model.Message;
 import com.securechat.model.User;
 import com.securechat.repository.MessageRepository;
 import com.securechat.repository.UserRepository;
+import com.securechat.security.JwtUtils;
 import com.securechat.service.MessageService;
-import org.springframework.http.HttpStatus;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-
+import java.util.Map;
 @Service
 public class MessageServiceImpl implements MessageService {
 
-    private final MessageRepository messageRepository;
     private final UserRepository userRepository;
+    private final MessageRepository messageRepository;
 
-    public MessageServiceImpl(MessageRepository messageRepository, UserRepository userRepository) {
+    public MessageServiceImpl(
+            MessageRepository messageRepository,
+            UserRepository userRepository
+    ) {
         this.messageRepository = messageRepository;
         this.userRepository = userRepository;
     }
 
     @Override
-    public MessageResponse sendMessage(MessageRequest request) {
-        User sender = getCurrentUser();
+    public Map<String, Object> sendMessage(MessageRequest request, String senderEmail) {
+        User sender = userRepository.findByEmail(senderEmail)
+                .orElseThrow(() -> new RuntimeException("Sender not found"));
+
         User recipient = userRepository.findByEmail(request.getRecipient())
-                .or(() -> userRepository.findByUsername(request.getRecipient()))
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Recipient not found"));
+                .orElseThrow(() -> new RuntimeException("Recipient not found"));
 
         Message message = new Message();
         message.setSender(sender);
@@ -53,56 +56,50 @@ public class MessageServiceImpl implements MessageService {
         message.setSignature(request.getSignature());
 
         Message savedMessage = messageRepository.save(message);
-        return toResponse(savedMessage);
+
+        return messageToMap(savedMessage);
     }
 
     @Override
-    public List<MessageResponse> getInbox() {
-        User currentUser = getCurrentUser();
-        return messageRepository.findByRecipientOrderBySentAtDesc(currentUser)
+    public List<Map<String, Object>> getInbox(String email) {
+        User recipient = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        return messageRepository.findByRecipient(recipient)
                 .stream()
-                .map(this::toResponse)
+                .map(this::messageToMap)
                 .toList();
     }
 
     @Override
-    public String deleteMessage(Long id) {
-        User currentUser = getCurrentUser();
-        Message message = messageRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Message not found"));
+    public String deleteMessage(Long id, String email) {
+        User currentUser = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
-        boolean canDelete = message.getRecipient().getId().equals(currentUser.getId())
-                || message.getSender().getId().equals(currentUser.getId());
+        Message message = messageRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Message not found"));
+
+        boolean canDelete =
+                message.getSender().getId().equals(currentUser.getId()) ||
+                        message.getRecipient().getId().equals(currentUser.getId());
+
         if (!canDelete) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
+            return "Access denied";
         }
 
         messageRepository.delete(message);
-
         return "Message deleted: " + id;
     }
 
-    private User getCurrentUser() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        if (authentication == null || authentication.getName() == null) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not authenticated");
-        }
-
-        return userRepository.findByEmail(authentication.getName())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Authenticated user not found"));
+    private Map<String, Object> messageToMap(Message message) {
+        Map<String, Object> result = new LinkedHashMap<>();
+        result.put("id", message.getId());
+        result.put("sender", message.getSender().getEmail());
+        result.put("recipient", message.getRecipient().getEmail());
+        result.put("encryptedContent", message.getEncryptedContent());
+        result.put("signature", message.getSignature());
+        result.put("sentAt", message.getSentAt());
+        result.put("read", message.isRead());
+        return result;
     }
-
-    private MessageResponse toResponse(Message message) {
-        return new MessageResponse(
-                message.getId(),
-                message.getSender().getEmail(),
-                message.getRecipient().getEmail(),
-                message.getEncryptedContent(),
-                message.getSignature(),
-                message.getSentAt(),
-                message.isRead()
-        );
-    }
-
 }

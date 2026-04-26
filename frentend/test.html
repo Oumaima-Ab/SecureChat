@@ -1,120 +1,468 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SecureChat Test</title>
+    <style>
+        :root {
+            --bg: #f4efe6;
+            --panel: #fffaf2;
+            --panel-alt: #f0e5d1;
+            --text: #1f1a14;
+            --muted: #746657;
+            --accent: #1c6b57;
+            --accent-dark: #124739;
+            --border: #d8c8b2;
+            --danger: #a73737;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Georgia, "Times New Roman", serif;
+            background:
+                radial-gradient(circle at top left, rgba(28, 107, 87, 0.15), transparent 28%),
+                linear-gradient(135deg, #f7f2e9 0%, #efe2cb 100%);
+            color: var(--text);
+        }
+
+        .page {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 32px 18px 48px;
+        }
+
+        .hero {
+            margin-bottom: 24px;
+            padding: 24px;
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            background: rgba(255, 250, 242, 0.92);
+            box-shadow: 0 16px 40px rgba(73, 48, 20, 0.08);
+        }
+
+        .hero h1 {
+            margin: 0 0 8px;
+            font-size: clamp(2rem, 4vw, 3.5rem);
+        }
+
+        .hero p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 1rem;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 18px;
+        }
+
+        .card {
+            padding: 20px;
+            border-radius: 18px;
+            background: var(--panel);
+            border: 1px solid var(--border);
+            box-shadow: 0 10px 24px rgba(73, 48, 20, 0.06);
+        }
+
+        .card h2 {
+            margin-top: 0;
+            margin-bottom: 14px;
+            font-size: 1.35rem;
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-bottom: 12px;
+        }
+
+        .field label {
+            font-size: 0.95rem;
+            color: var(--muted);
+        }
+
+        input,
+        textarea {
+            width: 100%;
+            padding: 11px 12px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: #fff;
+            color: var(--text);
+            font: inherit;
+        }
+
+        textarea {
+            min-height: 110px;
+            resize: vertical;
+        }
+
+        .actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 8px;
+        }
+
+        button {
+            border: 0;
+            border-radius: 999px;
+            padding: 11px 16px;
+            background: var(--accent);
+            color: white;
+            font: inherit;
+            cursor: pointer;
+            transition: transform 0.18s ease, background 0.18s ease;
+        }
+
+        button:hover {
+            transform: translateY(-1px);
+            background: var(--accent-dark);
+        }
+
+        button.secondary {
+            background: #6d5f50;
+        }
+
+        .status {
+            margin-top: 14px;
+            padding: 12px 14px;
+            border-radius: 14px;
+            background: var(--panel-alt);
+            border: 1px solid var(--border);
+            font-size: 0.95rem;
+        }
+
+        .status.error {
+            color: var(--danger);
+            border-color: rgba(167, 55, 55, 0.25);
+        }
+
+        .panel-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .pill {
+            padding: 6px 10px;
+            border-radius: 999px;
+            background: #e1f0e9;
+            color: var(--accent-dark);
+            font-size: 0.85rem;
+            word-break: break-all;
+        }
+
+        .message-list {
+            display: grid;
+            gap: 10px;
+        }
+
+        .message-item {
+            padding: 14px;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            background: #fff;
+        }
+
+        .message-item strong {
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        .message-meta {
+            color: var(--muted);
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+        }
+
+        pre {
+            margin: 0;
+            white-space: pre-wrap;
+            word-break: break-word;
+            font-family: "Courier New", monospace;
+        }
+
+        .empty {
+            color: var(--muted);
+            font-style: italic;
+        }
+    </style>
 </head>
 <body>
+<div class="page">
+    <section class="hero">
+        <h1>SecureChat Playground</h1>
+        <p>Tester l'inscription, la connexion, l'envoi d'un message, puis l'affichage de la reception depuis la meme page.</p>
+    </section>
 
-<h2>Auth</h2>
+    <div class="grid">
+        <section class="card">
+            <h2>Auth</h2>
 
-<input id="username" placeholder="username" autocomplete="username"><br>
-<input id="email" placeholder="email" autocomplete="email"><br>
-<input id="password" type="password" placeholder="password" autocomplete="current-password"><br>
+            <div class="field">
+                <label for="username">Username</label>
+                <input id="username" placeholder="user1" autocomplete="username">
+            </div>
 
-<button onclick="register()">Register</button>
-<button onclick="login()">Login</button>
+            <div class="field">
+                <label for="email">Email</label>
+                <input id="email" placeholder="user1@example.com" autocomplete="email">
+            </div>
 
-<h2>Message</h2>
+            <div class="field">
+                <label for="password">Password</label>
+                <input id="password" type="password" placeholder="password" autocomplete="current-password">
+            </div>
 
-<input id="recipient" placeholder="recipient email or username"><br>
-<textarea id="content" placeholder="encrypted content"></textarea><br>
-<input id="signature" placeholder="signature"><br>
+            <div class="actions">
+                <button onclick="register()">Register</button>
+                <button class="secondary" onclick="login()">Login</button>
+            </div>
 
-<button onclick="sendMessage()">Send Message</button>
-<button onclick="getInbox()">Inbox</button>
+            <div id="authStatus" class="status">Aucune session active.</div>
+        </section>
 
-<pre id="output"></pre>
+        <section class="card">
+            <h2>Send Message</h2>
+
+            <div class="field">
+                <label for="recipient">Recipient</label>
+                <input id="recipient" placeholder="bob@example.com">
+            </div>
+
+            <div class="field">
+                <label for="content">Encrypted content</label>
+                <textarea id="content" placeholder="cipher text"></textarea>
+            </div>
+
+            <div class="field">
+                <label for="signature">Signature</label>
+                <input id="signature" placeholder="message-signature">
+            </div>
+
+            <div class="actions">
+                <button onclick="sendMessage()">Send Message</button>
+                <button class="secondary" onclick="getInbox()">Refresh Inbox</button>
+            </div>
+
+            <div id="messageStatus" class="status">Pret a envoyer.</div>
+        </section>
+    </div>
+
+    <div class="grid" style="margin-top: 18px;">
+        <section class="card">
+            <div class="panel-title">
+                <h2>Last Sent</h2>
+                <span id="tokenBadge" class="pill">No token</span>
+            </div>
+            <div id="sentMessage" class="empty">Aucun message envoye.</div>
+        </section>
+
+        <section class="card">
+            <div class="panel-title">
+                <h2>Inbox</h2>
+                <button class="secondary" onclick="getInbox()">Load</button>
+            </div>
+            <div id="inboxMessages" class="empty">Aucun message recu.</div>
+        </section>
+    </div>
+
+    <section class="card" style="margin-top: 18px;">
+        <h2>Raw Output</h2>
+        <pre id="output">Aucune requete executee.</pre>
+    </section>
+</div>
 
 <script>
+    const API_BASE = "http://localhost:8080";
     let token = "";
 
+    function setStatus(id, message, isError = false) {
+        const element = document.getElementById(id);
+        element.textContent = message;
+        element.className = isError ? "status error" : "status";
+    }
+
     function log(data) {
-        document.getElementById("output").innerText =
-            typeof data === "string" ? data : JSON.stringify(data, null, 2);
+        const output = typeof data === "string" ? data : JSON.stringify(data, null, 2);
+        document.getElementById("output").textContent = output;
     }
 
-    // REGISTER
-    function register() {
-        fetch("http://localhost:8080/api/auth/register", {
-            method: "POST",
-            headers: {"Content-Type": "application/json"},
-            body: JSON.stringify({
-                username: document.getElementById("username").value,
-                email: document.getElementById("email").value,
-                password: document.getElementById("password").value
-            })
-        })
-            .then(async res => {
-                const text = await res.text();
-                if (!res.ok) throw new Error(text || "Register failed");
-                return text;
-            })
-            .then(data => log({message: data}))
-            .catch(err => log(err));
+    function updateTokenBadge() {
+        document.getElementById("tokenBadge").textContent = token
+            ? token.slice(0, 24) + "..."
+            : "No token";
     }
 
-    // LOGIN
-    function login() {
-        fetch("http://localhost:8080/api/auth/login", {
-            method: "POST",
-            headers: {"Content-Type": "application/json"},
-            body: JSON.stringify({
-                email: document.getElementById("email").value,
-                password: document.getElementById("password").value
-            })
-        })
-            .then(async res => {
-                const text = await res.text();
-                if (!res.ok) throw new Error(text || "Login failed");
-                return JSON.parse(text);
-            })
-            .then(data => {
-                token = data.token;
-                log(data);
-            })
-            .catch(err => log(err.message));
+    async function request(url, options = {}) {
+        const response = await fetch(url, options);
+        const text = await response.text();
+        let data = text;
+
+        try {
+            data = text ? JSON.parse(text) : "";
+        } catch (error) {
+            data = text;
+        }
+
+        if (!response.ok) {
+            throw new Error(typeof data === "string" ? data : JSON.stringify(data));
+        }
+
+        return data;
     }
 
-    // SEND MESSAGE
-    function sendMessage() {
-        fetch("http://localhost:8080/api/messages/send", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": "Bearer " + token
-            },
-            body: JSON.stringify({
-                recipient: document.getElementById("recipient").value,
-                encryptedContent: document.getElementById("content").value,
-                signature: document.getElementById("signature").value
-            })
-        })
-            .then(async res => {
-                const text = await res.text();
-                if (!res.ok) throw new Error(text || "Send failed");
-                return JSON.parse(text);
-            })
-            .then(data => log(data))
-            .catch(err => log(err.message));
+    function renderSingleMessage(containerId, message) {
+        const container = document.getElementById(containerId);
+
+        if (!message || typeof message !== "object") {
+            container.className = "";
+            container.innerHTML = `<pre>${String(message ?? "")}</pre>`;
+            return;
+        }
+
+        container.className = "message-list";
+        container.innerHTML = `
+            <article class="message-item">
+                <strong>From: ${escapeHtml(message.sender || "unknown")}</strong>
+                <div class="message-meta">To: ${escapeHtml(message.recipient || "unknown")}</div>
+                <div class="message-meta">Signature: ${escapeHtml(message.signature || "-")}</div>
+                <pre>${escapeHtml(message.encryptedContent || "")}</pre>
+            </article>
+        `;
     }
 
-    // GET INBOX
-    function getInbox() {
-        fetch("http://localhost:8080/api/messages/inbox", {
-            method: "GET",
-            headers: {
-                "Authorization": "Bearer " + token
-            }
-        })
-            .then(async res => {
-                const text = await res.text();
-                if (!res.ok) throw new Error(text || "Inbox failed");
-                return JSON.parse(text);
-            })
-            .then(data => log(data))
-            .catch(err => log(err.message));
+    function renderInbox(messages) {
+        const container = document.getElementById("inboxMessages");
+
+        if (!Array.isArray(messages)) {
+            container.className = "";
+            container.innerHTML = `<pre>${escapeHtml(String(messages ?? ""))}</pre>`;
+            return;
+        }
+
+        if (messages.length === 0) {
+            container.className = "empty";
+            container.textContent = "Aucun message recu.";
+            return;
+        }
+
+        container.className = "message-list";
+        container.innerHTML = messages.map(message => `
+            <article class="message-item">
+                <strong>From: ${escapeHtml(message.sender || "unknown")}</strong>
+                <div class="message-meta">To: ${escapeHtml(message.recipient || "unknown")}</div>
+                <div class="message-meta">Signature: ${escapeHtml(message.signature || "-")}</div>
+                <pre>${escapeHtml(message.encryptedContent || "")}</pre>
+            </article>
+        `).join("");
     }
+
+    function escapeHtml(value) {
+        return String(value)
+            .replaceAll("&", "&amp;")
+            .replaceAll("<", "&lt;")
+            .replaceAll(">", "&gt;")
+            .replaceAll('"', "&quot;")
+            .replaceAll("'", "&#39;");
+    }
+
+    async function register() {
+        try {
+            const data = await request(`${API_BASE}/api/auth/register`, {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({
+                    username: document.getElementById("username").value,
+                    email: document.getElementById("email").value,
+                    password: document.getElementById("password").value
+                })
+            });
+
+            setStatus("authStatus", "Inscription reussie.");
+            log(data);
+        } catch (error) {
+            setStatus("authStatus", error.message, true);
+            log(error.message);
+        }
+    }
+
+    async function login() {
+        try {
+            const data = await request(`${API_BASE}/api/auth/login`, {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({
+                    email: document.getElementById("email").value,
+                    password: document.getElementById("password").value
+                })
+            });
+
+            token = data.token || "";
+            updateTokenBadge();
+            setStatus("authStatus", "Connexion reussie. Token charge.");
+            log(data);
+        } catch (error) {
+            token = "";
+            updateTokenBadge();
+            setStatus("authStatus", error.message, true);
+            log(error.message);
+        }
+    }
+
+    async function sendMessage() {
+        try {
+            const data = await request(`${API_BASE}/api/messages/send`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "Bearer " + token
+                },
+                body: JSON.stringify({
+                    recipient: document.getElementById("recipient").value,
+                    encryptedContent: document.getElementById("content").value,
+                    signature: document.getElementById("signature").value
+                })
+            });
+
+            renderSingleMessage("sentMessage", data);
+            setStatus("messageStatus", "Message envoye.");
+            log(data);
+        } catch (error) {
+            setStatus("messageStatus", error.message, true);
+            log(error.message);
+        }
+    }
+
+    async function getInbox() {
+        try {
+            const data = await request(`${API_BASE}/api/messages/inbox`, {
+                method: "GET",
+                headers: {
+                    "Authorization": "Bearer " + token
+                }
+            });
+
+            renderInbox(data);
+            setStatus("messageStatus", "Inbox mise a jour.");
+            log(data);
+        } catch (error) {
+            setStatus("messageStatus", error.message, true);
+            log(error.message);
+        }
+    }
+
+    updateTokenBadge();
 </script>
-
 </body>
 </html>

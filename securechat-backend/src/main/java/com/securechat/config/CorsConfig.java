@@ -29,6 +29,7 @@ public class CorsConfig {
             @Override
             public void addCorsMappings(@NonNull CorsRegistry registry) {
                 registry.addMapping("/api/**")
+                        .allowedOrigins("*")
                         .allowedOrigins(
                                 "http://localhost:3000",
                                 "http://localhost:5500",
@@ -42,5 +43,6 @@ public class CorsConfig {
         };
     }
 }
+
 
 

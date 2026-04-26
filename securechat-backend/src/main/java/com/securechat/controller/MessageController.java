@@ -17,13 +17,14 @@ package com.securechat.controller;
  * Controller / Présentation
  */
 
-import com.securechat.dto.MessageResponse;
 import com.securechat.dto.MessageRequest;
 import com.securechat.service.MessageService;
 import jakarta.validation.Valid;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/messages")
@@ -35,18 +36,20 @@ public class MessageController {
     }
 
     @PostMapping("/send")
-    public MessageResponse send(@Valid @RequestBody MessageRequest request) {
-        return messageService.sendMessage(request);
+    public Map<String, Object> send(@RequestBody MessageRequest request,
+                                    Authentication authentication) {
+        return messageService.sendMessage(request, authentication.getName());
     }
 
     @GetMapping("/inbox")
-    public List<MessageResponse> inbox() {
-        return messageService.getInbox();
+    public List<Map<String, Object>> inbox(Authentication authentication) {
+        return messageService.getInbox(authentication.getName());
     }
 
     @DeleteMapping("/{id}")
-    public String delete(@PathVariable Long id) {
-        return messageService.deleteMessage(id);
+    public String delete(@PathVariable Long id,
+                         Authentication authentication) {
+        return messageService.deleteMessage(id, authentication.getName());
     }
 
 }
