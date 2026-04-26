@@ -14,6 +14,21 @@ package com.securechat.dto;
  * Couche :
  * DTO / Transport
  */
-public class MessageRequest {
-}
 
+import jakarta.validation.constraints.NotBlank;
+import lombok.Setter;
+import lombok.Getter;
+@Setter
+@Getter
+public class MessageRequest {
+
+    @NotBlank(message = "Recipient is required")
+    private String recipient;
+
+    @NotBlank(message = "Encrypted content is required")
+    private String encryptedContent;
+
+    @NotBlank(message = "Signature is required")
+    private String signature;
+
+}

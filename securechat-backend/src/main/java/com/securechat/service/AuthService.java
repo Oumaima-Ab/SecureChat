@@ -14,6 +14,14 @@ package com.securechat.service;
  * Couche :
  * Service / Métier
  */
+
+import com.securechat.dto.AuthResponse;
+import com.securechat.dto.LoginRequest;
+import com.securechat.dto.RegisterRequest;
+
 public interface AuthService {
+    String register(RegisterRequest request);
+    AuthResponse login(LoginRequest request);
+
 }
 

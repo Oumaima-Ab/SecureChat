@@ -1,5 +1,7 @@
 package com.securechat.service;
 
+import com.securechat.dto.MessageRequest;
+
 /*
  * Rôle :
  * Interface de la logique de messagerie.
@@ -13,5 +15,8 @@ package com.securechat.service;
  * Service / Métier
  */
 public interface MessageService {
+    String sendMessage(MessageRequest request);
+    String getInbox();
+    String deleteMessage(Long id);
 }
 
