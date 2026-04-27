@@ -14,9 +14,9 @@ package com.securechat.repository;
  */
 
 import com.securechat.model.User;
-import jakarta.validation.constraints.NotBlank;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<User, Long> {
@@ -27,5 +27,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     boolean existsByUsername(String username);
 
-    Optional<Object> findByUsername(@NotBlank(message = "Recipient is required") String recipient);
+    Optional<User> findByUsername(String username);
+
+    List<User> findByUsernameContainingIgnoreCaseOrEmailContainingIgnoreCase(String username, String email);
 }

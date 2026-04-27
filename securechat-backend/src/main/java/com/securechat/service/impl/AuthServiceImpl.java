@@ -44,6 +44,10 @@ public class AuthServiceImpl implements AuthService {
             return "Email already exists";
         }
 
+        if (userRepository.existsByUsername(request.getUsername())) {
+            return "Username already exists";
+        }
+
         User user = new User();
         user.setUsername(request.getUsername());
         user.setEmail(request.getEmail());
@@ -78,4 +82,3 @@ public class AuthServiceImpl implements AuthService {
 
 
 }
-

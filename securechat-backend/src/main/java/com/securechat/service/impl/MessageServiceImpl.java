@@ -19,9 +19,7 @@ import com.securechat.model.Message;
 import com.securechat.model.User;
 import com.securechat.repository.MessageRepository;
 import com.securechat.repository.UserRepository;
-import com.securechat.security.JwtUtils;
 import com.securechat.service.MessageService;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.LinkedHashMap;
@@ -66,6 +64,17 @@ public class MessageServiceImpl implements MessageService {
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         return messageRepository.findByRecipient(recipient)
+                .stream()
+                .map(this::messageToMap)
+                .toList();
+    }
+
+    @Override
+    public List<Map<String, Object>> getConversation(String email) {
+        User currentUser = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        return messageRepository.findBySenderOrRecipientOrderBySentAtAsc(currentUser, currentUser)
                 .stream()
                 .map(this::messageToMap)
                 .toList();

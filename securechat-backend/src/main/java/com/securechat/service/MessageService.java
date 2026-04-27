@@ -21,5 +21,7 @@ public interface MessageService {
 
     List<Map<String, Object>> getInbox(String email);
 
+    List<Map<String, Object>> getConversation(String email);
+
     String deleteMessage(Long id, String email);
 }

@@ -46,6 +46,11 @@ public class MessageController {
         return messageService.getInbox(authentication.getName());
     }
 
+    @GetMapping
+    public List<Map<String, Object>> conversation(Authentication authentication) {
+        return messageService.getConversation(authentication.getName());
+    }
+
     @DeleteMapping("/{id}")
     public String delete(@PathVariable Long id,
                          Authentication authentication) {
